@@ -5,16 +5,20 @@ export type Falsy = false | null | undefined;
 
 /**
  * Create reducer that manages key-value dictionary state with values of same
- * shape.
- * It also accepts optional dependency as third argument and passes it to
- * child reducer as fourth argument.
+ * shape. Child reducer is called on every action for each dictionary value,
+ * and dictionary key is supplied to the child reducer as third argument.
+ *
+ * Any extra arguments for resulting reducer are passed to the child reducer
+ * following dictionary key.
  *
  * @param childReducer Reducer for dictionary values. Receives dictionary key as
  *  third argument.
- * @param [addKey] Function that determines whether action should result in
- *  adding new key to the dictionary.
- * @param [removeKey] Function that determines whether action should result in
- *  removing key from the dictionary.
+ * @param [addKey] Function that will be called on every action to determine
+ *  whether that action should result in adding a new key to the dictionary, in
+ *  which case it should return the key.
+ * @param [removeKey] Function that will be called on every action to determine
+ *  whether that action should result in removing a key from the dictionary, in
+ *  which case it should return the key.
  * @param initialState Initial state for resulting reducer.
  * @returns Dictionary reducer.
  *
