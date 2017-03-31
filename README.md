@@ -1,4 +1,4 @@
-# Recombine
+# Recombine [![npm version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url]
 
 Utilities for combining Redux reducers
 
@@ -73,3 +73,8 @@ following dictionary key.
 
 * More documentation covering rationale and use cases.
 * More tests
+
+[npm-image]: https://badge.fury.io/js/recombine.svg
+[npm-url]: https://badge.fury.io/js/recombine
+[travis-image]: https://travis-ci.org/aikoven/recombine.svg?branch=master
+[travis-url]: https://travis-ci.org/aikoven/recombine
