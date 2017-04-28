@@ -29,76 +29,98 @@ export default function dictionaryReducer<S>(
   addKey?: (action: Action) => string | Falsy,
   removeKey?: (action: Action) => string | Falsy,
   initialState?: Dict<S>,
-): Reducer<Dict<S>>;
+): Reducer<Dict<S>> & {
+  childReducer: (state: S, action: Action, key: string) => S;
+};
 export default function dictionaryReducer<S, A1>(
   childReducer: (state: S, action: Action, key: string, arg1: A1) => S,
   addKey?: (action: Action) => string | Falsy,
   removeKey?: (action: Action) => string | Falsy,
   initialState?: Dict<S>,
-): (state: Dict<S>, action: Action, arg1: A1) => Dict<S>;
+): ((state: Dict<S>, action: Action, arg1: A1) => Dict<S>) & {
+  childReducer: (state: S, action: Action, key: string, arg1: A1) => S;
+};
+
 export default function dictionaryReducer<S, A1, A2>(
   childReducer: (state: S, action: Action, key: string,
                  arg1: A1, arg2: A2) => S,
   addKey?: (action: Action) => string | Falsy,
   removeKey?: (action: Action) => string | Falsy,
   initialState?: Dict<S>,
-): (state: Dict<S>, action: Action, arg1: A1, arg2: A2) => Dict<S>;
+): ((state: Dict<S>, action: Action, arg1: A1, arg2: A2) => Dict<S>) & {
+  childReducer: (state: S, action: Action, key: string,
+                 arg1: A1, arg2: A2) => S;
+};
+
 export default function dictionaryReducer<S, A1, A2, A3>(
   childReducer: (state: S, action: Action, key: string,
                  arg1: A1, arg2: A2, arg3: A3) => S,
   addKey?: (action: Action) => string | Falsy,
   removeKey?: (action: Action) => string | Falsy,
   initialState?: Dict<S>,
-): (state: Dict<S>, action: Action, arg1: A1, arg2: A2, arg3: A3) => Dict<S>;
+): ((state: Dict<S>, action: Action,
+     arg1: A1, arg2: A2, arg3: A3) => Dict<S>) & {
+  childReducer: (state: S, action: Action, key: string,
+                 arg1: A1, arg2: A2, arg3: A3) => S;
+};
+
 export default function dictionaryReducer<S, A1, A2, A3, A4>(
   childReducer: (state: S, action: Action, key: string,
                  arg1: A1, arg2: A2, arg3: A3, arg4: A4, ...rest: any[]) => S,
   addKey?: (action: Action) => string | Falsy,
   removeKey?: (action: Action) => string | Falsy,
   initialState?: Dict<S>,
-): (state: Dict<S>, action: Action,
-    arg1: A1, arg2: A2, arg3: A3, arg4: A4, ...rest: any[]) => Dict<S>;
+): ((state: Dict<S>, action: Action,
+     arg1: A1, arg2: A2, arg3: A3, arg4: A4, ...rest: any[]) => Dict<S>) & {
+  childReducer: (state: S, action: Action, key: string,
+                 arg1: A1, arg2: A2, arg3: A3, arg4: A4, ...rest: any[]) => S;
+};
+
 export default function dictionaryReducer<S>(
   childReducer: (state: S, action: Action, key: string, ...args: any[]) => S,
   addKey?: (action: Action) => string | Falsy,
   removeKey?: (action: Action) => string | Falsy,
   initialState: Dict<S> = {},
 ) {
-  return (state: Dict<S> = initialState, action: Action,
-          ...args: any[]): Dict<S> => {
-    let hasChanged: boolean = false;
-    const nextState: Dict<S> = {};
+  return Object.assign(
+    (state: Dict<S> = initialState, action: Action,
+     ...args: any[]): Dict<S> => {
+      let hasChanged: boolean = false;
+      const nextState: Dict<S> = {};
 
-    const keyToAdd = addKey && addKey(action);
+      const keyToAdd = addKey && addKey(action);
 
-    if (keyToAdd) {
-      hasChanged = true;
-      nextState[keyToAdd] = childReducer(undefined!, action, keyToAdd, ...args);
+      if (keyToAdd) {
+        hasChanged = true;
+        nextState[keyToAdd] =
+          childReducer(undefined!, action, keyToAdd, ...args);
 
-      if (nextState[keyToAdd] === undefined)
-        throw new Error(`Reducer '${keyToAdd}' returned undefined`);
-    }
+        if (nextState[keyToAdd] === undefined)
+          throw new Error(`Reducer '${keyToAdd}' returned undefined`);
+      }
 
-    const keyToRemove = removeKey && removeKey(action);
+      const keyToRemove = removeKey && removeKey(action);
 
-    if (keyToRemove)
-      hasChanged = true;
+      if (keyToRemove)
+        hasChanged = true;
 
-    for (let key in state) {
-      if (!Object.prototype.hasOwnProperty.call(state, key) ||
-          key === keyToRemove)
-        continue;
+      for (let key in state) {
+        if (!Object.prototype.hasOwnProperty.call(state, key) ||
+            key === keyToRemove)
+          continue;
 
-      const itemState = state[key];
-      const nextItemState = childReducer(itemState, action, key, ...args);
+        const itemState = state[key];
+        const nextItemState = childReducer(itemState, action, key, ...args);
 
-      if (nextItemState === undefined)
-        throw new Error(`Reducer '${key}' returned undefined`);
+        if (nextItemState === undefined)
+          throw new Error(`Reducer '${key}' returned undefined`);
 
-      nextState[key] = nextItemState;
-      hasChanged = hasChanged || nextItemState !== itemState;
-    }
+        nextState[key] = nextItemState;
+        hasChanged = hasChanged || nextItemState !== itemState;
+      }
 
-    return hasChanged ? nextState : state;
-  };
+      return hasChanged ? nextState : state;
+    },
+    {childReducer},
+  );
 }

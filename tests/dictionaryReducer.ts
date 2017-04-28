@@ -5,18 +5,23 @@ import dictionaryReducer from "../src/dictionaryReducer";
 test('dictionaryReducer', assert => {
   type State = Array<{type: string, key: string, arg: string}>;
 
-  const reducer = dictionaryReducer(
-    (state: State = [], action: Action, key: string, arg: string): State => {
-      const {type} = action;
+  const childReducer = (state: State = [], action: Action,
+                        key: string, arg: string): State => {
+    const {type} = action;
 
-      return [...state, {type, key, arg}];
-    },
+    return [...state, {type, key, arg}];
+  };
+
+  const reducer = dictionaryReducer(
+    childReducer,
     action => action.type === 'adding' && (action as any).key,
     action => action.type === 'removing' && (action as any).key,
     {
       one: [],
     },
   );
+
+  assert.equal(reducer.childReducer, childReducer);
 
   let state = reducer(undefined!, {type: 'init'}, 'foo');
 

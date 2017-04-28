@@ -4,7 +4,7 @@ import combineReducers from "../src/combineReducers";
 
 
 test('combineReducers', assert => {
-  const reducer = combineReducers({
+  const reducers = {
     one(state: string = '', action: Action,
         arg1: string, arg2: number): string {
       if (action.type === 'MyType') {
@@ -21,7 +21,11 @@ test('combineReducers', assert => {
 
       return state;
     },
-  });
+  };
+
+  const reducer = combineReducers(reducers);
+
+  assert.deepEqual(reducer.childReducers, reducers);
 
   let state = reducer(undefined!, {type: 'init'}, 'foo', 1);
 
