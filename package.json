@@ -1,5 +1,5 @@
 {
-  "name": "recombine",
+  "name": "@aikoven/recombine",
   "version": "0.1.0",
   "description": "Utilities for combining Redux reducers",
   "main": "lib/index.js",
