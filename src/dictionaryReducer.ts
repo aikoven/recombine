@@ -1,4 +1,4 @@
-import {Action, Reducer} from "redux";
+import {Reducer, Reducer1, Reducer2, Reducer3, Reducer4} from './common';
 
 export type Dict<S> = {[key: string]: S};
 export type Falsy = false | null | undefined;
@@ -24,67 +24,54 @@ export type Falsy = false | null | undefined;
  *
  * @template S Child reducer state type.
  */
-export default function dictionaryReducer<S>(
-  childReducer: (state: S, action: Action, key: string) => S,
-  addKey?: (action: Action) => string | Falsy,
-  removeKey?: (action: Action) => string | Falsy,
+export default function dictionaryReducer<S, A>(
+  childReducer: Reducer1<S, A, string>,
+  addKey?: (action: A) => string | Falsy,
+  removeKey?: (action: A) => string | Falsy,
   initialState?: Dict<S>,
-): Reducer<Dict<S>> & {
-  childReducer: (state: S, action: Action, key: string) => S;
+): Reducer<Dict<S>, A> & {
+  childReducer: Reducer1<S, A, string>;
 };
-export default function dictionaryReducer<S, A1>(
-  childReducer: (state: S, action: Action, key: string, arg1: A1) => S,
-  addKey?: (action: Action) => string | Falsy,
-  removeKey?: (action: Action) => string | Falsy,
+export default function dictionaryReducer<S, A, T1>(
+  childReducer: Reducer2<S, A, string, T1>,
+  addKey?: (action: A) => string | Falsy,
+  removeKey?: (action: A) => string | Falsy,
   initialState?: Dict<S>,
-): ((state: Dict<S>, action: Action, arg1: A1) => Dict<S>) & {
-  childReducer: (state: S, action: Action, key: string, arg1: A1) => S;
-};
-
-export default function dictionaryReducer<S, A1, A2>(
-  childReducer: (state: S, action: Action, key: string,
-                 arg1: A1, arg2: A2) => S,
-  addKey?: (action: Action) => string | Falsy,
-  removeKey?: (action: Action) => string | Falsy,
-  initialState?: Dict<S>,
-): ((state: Dict<S>, action: Action, arg1: A1, arg2: A2) => Dict<S>) & {
-  childReducer: (state: S, action: Action, key: string,
-                 arg1: A1, arg2: A2) => S;
+): Reducer1<Dict<S>, A, T1> & {
+  childReducer: Reducer2<S, A, string, T1>;
 };
 
-export default function dictionaryReducer<S, A1, A2, A3>(
-  childReducer: (state: S, action: Action, key: string,
-                 arg1: A1, arg2: A2, arg3: A3) => S,
-  addKey?: (action: Action) => string | Falsy,
-  removeKey?: (action: Action) => string | Falsy,
+export default function dictionaryReducer<S, A, T1, T2>(
+  childReducer: Reducer3<S, A, string, T1, T2>,
+  addKey?: (action: A) => string | Falsy,
+  removeKey?: (action: A) => string | Falsy,
   initialState?: Dict<S>,
-): ((state: Dict<S>, action: Action,
-     arg1: A1, arg2: A2, arg3: A3) => Dict<S>) & {
-  childReducer: (state: S, action: Action, key: string,
-                 arg1: A1, arg2: A2, arg3: A3) => S;
+): Reducer2<Dict<S>, A, T1, T2> & {
+  childReducer: Reducer3<S, A, string, T1, T2>;
 };
 
-export default function dictionaryReducer<S, A1, A2, A3, A4>(
-  childReducer: (state: S, action: Action, key: string,
-                 arg1: A1, arg2: A2, arg3: A3, arg4: A4, ...rest: any[]) => S,
-  addKey?: (action: Action) => string | Falsy,
-  removeKey?: (action: Action) => string | Falsy,
+export default function dictionaryReducer<S, A, T1, T2, T3>(
+  childReducer: Reducer4<S, A, string, T1, T2, T3>,
+  addKey?: (action: A) => string | Falsy,
+  removeKey?: (action: A) => string | Falsy,
   initialState?: Dict<S>,
-): ((state: Dict<S>, action: Action,
-     arg1: A1, arg2: A2, arg3: A3, arg4: A4, ...rest: any[]) => Dict<S>) & {
-  childReducer: (state: S, action: Action, key: string,
-                 arg1: A1, arg2: A2, arg3: A3, arg4: A4, ...rest: any[]) => S;
+): Reducer3<Dict<S>, A, T1, T2, T3> & {
+  childReducer: Reducer4<S, A, string, T1, T2, T3>;
 };
 
-export default function dictionaryReducer<S>(
-  childReducer: (state: S, action: Action, key: string, ...args: any[]) => S,
-  addKey?: (action: Action) => string | Falsy,
-  removeKey?: (action: Action) => string | Falsy,
+export default function dictionaryReducer<S, A>(
+  childReducer: (
+    state: S | undefined,
+    action: A,
+    key: string,
+    ...args: any[],
+  ) => S,
+  addKey?: (action: A) => string | Falsy,
+  removeKey?: (action: A) => string | Falsy,
   initialState: Dict<S> = {},
 ) {
   return Object.assign(
-    (state: Dict<S> = initialState, action: Action,
-     ...args: any[]): Dict<S> => {
+    (state: Dict<S> = initialState, action: A, ...args: any[]): Dict<S> => {
       let hasChanged: boolean = false;
       const nextState: Dict<S> = {};
 
@@ -92,8 +79,12 @@ export default function dictionaryReducer<S>(
 
       if (keyToAdd) {
         hasChanged = true;
-        nextState[keyToAdd] =
-          childReducer(undefined!, action, keyToAdd, ...args);
+        nextState[keyToAdd] = childReducer(
+          undefined,
+          action,
+          keyToAdd,
+          ...args,
+        );
 
         if (nextState[keyToAdd] === undefined)
           throw new Error(`Reducer '${keyToAdd}' returned undefined`);
@@ -101,12 +92,13 @@ export default function dictionaryReducer<S>(
 
       const keyToRemove = removeKey && removeKey(action);
 
-      if (keyToRemove)
-        hasChanged = true;
+      if (keyToRemove) hasChanged = true;
 
       for (let key in state) {
-        if (!Object.prototype.hasOwnProperty.call(state, key) ||
-            key === keyToRemove)
+        if (
+          !Object.prototype.hasOwnProperty.call(state, key) ||
+          key === keyToRemove
+        )
           continue;
 
         const itemState = state[key];

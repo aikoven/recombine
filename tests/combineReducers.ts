@@ -27,7 +27,7 @@ test('combineReducers', assert => {
 
   assert.deepEqual(reducer.childReducers, reducers);
 
-  let state = reducer(undefined!, {type: 'init'}, 'foo', 1);
+  let state = reducer(undefined, {type: 'init'}, 'foo', 1);
 
   assert.deepEqual(state, {one: '', two: 0});
 

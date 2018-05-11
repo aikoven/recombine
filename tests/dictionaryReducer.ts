@@ -23,7 +23,7 @@ test('dictionaryReducer', assert => {
 
   assert.equal(reducer.childReducer, childReducer);
 
-  let state = reducer(undefined!, {type: 'init'}, 'foo');
+  let state = reducer(undefined, {type: 'init'}, 'foo');
 
   assert.deepEqual(state, {one: [{type: 'init', key: 'one', arg: 'foo'}]});
 

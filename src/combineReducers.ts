@@ -1,5 +1,4 @@
-import {Reducer, Action} from "redux";
-
+import {Reducer, Reducer1, Reducer2, Reducer3} from './common';
 
 /**
  * Same as original `combineReducers` from Redux but returned reducer accepts
@@ -7,64 +6,44 @@ import {Reducer, Action} from "redux";
  *
  * @template R Resulting reducer state type.
  */
-export default function combineReducers<S>(reducers: {
-  [P in keyof S]: Reducer<S[P]>;
-}): Reducer<S> & {
-  childReducers: {
-    [P in keyof S]: Reducer<S[P]>;
-  };
+export default function combineReducers<S, A>(
+  reducers: {[P in keyof S]: Reducer<S[P], A>},
+): Reducer<S, A> & {
+  childReducers: {[P in keyof S]: Reducer<S[P], A>};
 };
 
-export default function combineReducers<S, A1>(reducers: {
-  [P in keyof S]: (state: S[P], action: Action, arg1: A1) => S[P];
-}): ((state: S, action: Action, arg1: A1) => S) & {
-  childReducers: {
-    [P in keyof S]: (state: S[P], action: Action, arg1: A1) => S[P];
-  };
+export default function combineReducers<S, A, T1>(
+  reducers: {[P in keyof S]: Reducer1<S[P], A, T1>},
+): Reducer1<S, A, T1> & {
+  childReducers: {[P in keyof S]: Reducer1<S[P], A, T1>};
 };
 
-export default function combineReducers<S, A1, A2>(reducers: {
-  [P in keyof S]: (state: S[P], action: Action, arg1: A1, arg2: A2) => S[P];
-}): ((state: S, action: Action, arg1: A1, arg2: A2) => S) & {
-  childReducers: {
-    [P in keyof S]: (state: S[P], action: Action, arg1: A1, arg2: A2) => S[P];
-  };
+export default function combineReducers<S, A, T1, T2>(
+  reducers: {[P in keyof S]: Reducer2<S[P], A, T1, T2>},
+): Reducer2<S, A, T1, T2> & {
+  childReducers: {[P in keyof S]: Reducer2<S[P], A, T1, T2>};
 };
 
-export default function combineReducers<S, A1, A2, A3>(reducers: {
-  [P in keyof S]: (state: S[P], action: Action,
-                   arg1: A1, arg2: A2, arg3: A3) => S[P];
-}): ((state: S, action: Action, arg1: A1, arg2: A2, arg3: A3) => S) & {
-  childReducers: {
-    [P in keyof S]: (state: S[P], action: Action,
-                     arg1: A1, arg2: A2, arg3: A3) => S[P];
-  };
+export default function combineReducers<S, A, T1, T2, T3>(
+  reducers: {[P in keyof S]: Reducer3<S[P], A, T1, T2, T3>},
+): Reducer3<S, A, T1, T2, T3> & {
+  childReducers: {[P in keyof S]: Reducer3<S[P], A, T1, T2, T3>};
 };
 
-export default function combineReducers<S, A1, A2, A3, A4>(reducers: {
-  [P in keyof S]: (state: S[P], action: Action,
-                   arg1: A1, arg2: A2, arg3: A3, arg4: A4,
-                   ...rest: any[]) => S[P];
-}): ((state: S, action: Action,
-      arg1: A1, arg2: A2, arg3: A3, arg4: A4,
-      ...rest: any[]) => S) & {
-  childReducers: {
-    [P in keyof S]: (state: S[P], action: Action,
-                     arg1: A1, arg2: A2, arg3: A3, arg4: A4,
-                     ...rest: any[]) => S[P];
-  };
-};
-
-export default function combineReducers(reducers: {
-  [key: string]: <S>(state: S, action: Action, ...args: any[]) => S;
-}): <S>(state: S, action: Action, ...args: any[]) => S {
+export default function combineReducers<S, A>(reducers: {
+  [key: string]: (state: S | undefined, action: A, ...args: any[]) => S;
+}): (
+  state: {[key: string]: S | undefined} | undefined,
+  action: A,
+  ...args: any[],
+) => {[key: string]: S | undefined} {
   const reducerKeys = Object.keys(reducers);
-  type S = {[key: string]: any};
+  type State = {[key: string]: S | undefined};
 
   return Object.assign(
-    (state: S = {}, action: Action, ...args: any[]): S => {
+    (state: State | undefined = {}, action: A, ...args: any[]): State => {
       let hasChanged = false;
-      const nextState: S = {};
+      const nextState: State = {};
 
       for (let key of reducerKeys) {
         const prevKeyState = state[key];
