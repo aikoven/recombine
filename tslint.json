@@ -19,7 +19,6 @@
     "no-internal-module": true,
     "no-trailing-whitespace": false,
     "no-unused-expression": true,
-    "no-use-before-declare": true,
     "no-var-keyword": true,
     "one-line": [
       true,
@@ -32,7 +31,8 @@
     "semicolon": true,
     "trailing-comma": [
       true, {
-        "multiline": "always"
+        "multiline": "always",
+        "esSpecCompliant": true
       }
     ],
     "triple-equals": [

@@ -35,7 +35,7 @@ export default function combineReducers<S, A>(reducers: {
 }): (
   state: {[key: string]: S | undefined} | undefined,
   action: A,
-  ...args: any[],
+    ...args: any[]
 ) => {[key: string]: S | undefined} {
   const reducerKeys = Object.keys(reducers);
   type State = {[key: string]: S | undefined};

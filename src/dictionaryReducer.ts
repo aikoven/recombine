@@ -64,7 +64,7 @@ export default function dictionaryReducer<S, A>(
     state: S | undefined,
     action: A,
     key: string,
-    ...args: any[],
+    ...args: any[]
   ) => S,
   addKey?: (action: A) => string | Falsy,
   removeKey?: (action: A) => string | Falsy,
